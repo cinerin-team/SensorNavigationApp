@@ -1,9 +1,9 @@
 package com.example.sensornavigationapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.*
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ComponentActivity
 
+
+@SuppressLint("RestrictedApi")
 class MainActivity : ComponentActivity() {
     lateinit var sensorManager: SensorManager
     lateinit var accelerometer: Sensor
