@@ -29,9 +29,16 @@ class MainActivity : ComponentActivity() {
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) ?: error("No Magnetometer found")
 
         setContent {
-            SensorNavigationApp(sensorManager, accelerometer, magnetometer)
+            MaterialTheme {
+                Greeting("Android")
+            }
         }
     }
+}
+
+@Composable
+fun Greeting(name: String) {
+    Text(text = "Hello, $name!")
 }
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.sensornavigationapp_
+package com.example.sensornavigationapp
 
 import org.junit.Test
 
