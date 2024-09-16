@@ -12,14 +12,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Composable
-
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @SuppressLint("RestrictedApi")
 class MainActivity : ComponentActivity() {
-    lateinit var sensorManager: SensorManager
-    lateinit var accelerometer: Sensor
-    lateinit var magnetometer: Sensor
+    private lateinit var sensorManager: SensorManager
+    private lateinit var accelerometer: Sensor
+    private lateinit var magnetometer: Sensor
+    private var previousTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,15 +31,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                Greeting("Android")
+                SensorNavigationApp(sensorManager, accelerometer, magnetometer)
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello, $name!")
 }
 
 @Composable
@@ -49,18 +45,21 @@ fun SensorNavigationApp(
 ) {
     var distance by remember { mutableStateOf(0.0) }
     var isMeasuring by remember { mutableStateOf(false) }
+    var previousVelocity by remember { mutableStateOf(0.0) }
+    var previousDistance by remember { mutableStateOf(0.0) }
+    var previousTime by remember { mutableStateOf(System.currentTimeMillis()) }
 
     val sensorEventListener = remember {
         object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
                 if (isMeasuring) {
-                    // Itt frissítjük a távolságot a gyorsulásmérőből és mágneses mező adatokból
+                    val currentTime = System.currentTimeMillis()
+                    val deltaTime = (currentTime - previousTime) / 1000f // Convert ms to seconds
+                    previousTime = currentTime
+
                     if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                        // Gyorsulásmérő adatainak feldolgozása (időbeli integrálás távolságra)
-                        distance += processAccelerometerData(event)
-                    }
-                    if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
-                        // Mágneses mező adatok kezelése, irányítási korrekció
+                        distance = processAccelerometerData(event, deltaTime, previousVelocity, previousDistance)
+                        previousDistance = distance
                     }
                 }
             }
@@ -71,12 +70,8 @@ fun SensorNavigationApp(
 
     LaunchedEffect(isMeasuring) {
         if (isMeasuring) {
-            sensorManager.registerListener(
-                sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL
-            )
-            sensorManager.registerListener(
-                sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL
-            )
+            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+            sensorManager.registerListener(sensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
         } else {
             sensorManager.unregisterListener(sensorEventListener)
         }
@@ -119,8 +114,20 @@ fun SensorNavigationApp(
     }
 }
 
-fun processAccelerometerData(event: SensorEvent): Double {
-    // Gyorsulásmérő adatainak feldolgozása, például egyszerű integrálással.
-    // Itt Kalman-szűrőt alkalmazhatsz a zajok kiszűrésére.
-    return event.values[0].toDouble() // Ezt módosítsd valós integrálásra
+fun processAccelerometerData(
+    event: SensorEvent,
+    deltaTime: Float,
+    previousVelocity: Double,
+    previousDistance: Double
+): Double {
+    // Calculate the magnitude of the acceleration vector
+    val acceleration = sqrt(
+        event.values[0].pow(2) +
+                event.values[1].pow(2) +
+                event.values[2].pow(2)
+    )
+    // Update velocity using acceleration and time (v = u + at)
+    val velocity = previousVelocity + (acceleration * deltaTime)
+    // Update distance using velocity and time (d = v * t)
+    return previousDistance + (velocity * deltaTime)
 }

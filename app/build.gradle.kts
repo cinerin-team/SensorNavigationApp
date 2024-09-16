@@ -54,7 +54,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.compose.material:material:1.5.0")
     implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.monitor)
+    implementation(libs.androidx.junit.ktx)
+    testImplementation(libs.junit.junit)
+    androidTestImplementation(libs.junit.junit)
 }
