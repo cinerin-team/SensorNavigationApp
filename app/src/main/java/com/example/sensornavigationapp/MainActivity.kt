@@ -8,6 +8,7 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
@@ -92,11 +95,14 @@ fun SensorNavigationApp(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .background(color = Color.White),  // Set white background
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Distance: ${"%.2f".format(distance)} meters")
+        Text(text = "Distance: ${"%.2f".format(distance)} meters",
+            color = Color.Black,  // Set black text
+            style = MaterialTheme.typography.h6)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -105,13 +111,13 @@ fun SensorNavigationApp(
                 isMeasuring = true
                 distance = 0.0 // Reset distance on start
             }) {
-                Text("Start")
+                Text("Start", color = Color.Black)  // Black text for buttons
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Button(onClick = { isMeasuring = false }) {
-                Text("Stop")
+                Text("Stop", color = Color.Black)
             }
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -120,7 +126,7 @@ fun SensorNavigationApp(
                 isMeasuring = false
                 distance = 0.0
             }) {
-                Text("Reset")
+                Text("Reset", color = Color.Black)
             }
         }
     }
